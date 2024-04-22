@@ -31,7 +31,7 @@ def udp_monitor_callback(pkt):
     inLayer3 = pkt.payload.payload.payload.payload.payload
 
     if(pkt.haslayer(IP) and inLayer3.dst == INNERIP):
-        print("incoming IP packet matches",  INNERIP)
+        print("incoming IP packet matches",  VXLAN(pkt))
         outLayer3 = pkt.payload
         udpLayer = pkt.payload.payload
         vxlanLayer = pkt.payload.payload.payload

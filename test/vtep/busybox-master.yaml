@@ -7,8 +7,6 @@ metadata:
   labels:
     app: busybox
 spec:
-  nodeSelector:
-    dedicated: master
   containers:
   - name: busybox
     image: busybox

@@ -4,6 +4,7 @@
 
 set -e
 
+
 ### User Setting
 
 KUBERNETES_VERSION=v1.29
