@@ -489,15 +489,21 @@ int tail_handle_arp(struct __ctx_buff *ctx)
 	struct vtep_key vkey = {};
 	struct vtep_value *info;
 	__u32 key_size;
+	struct endpoint_info *target_endpoint_info;
 
 	key_size = TUNNEL_KEY_WITHOUT_SRC_IP;
 	if (unlikely(ctx_get_tunnel_key(ctx, &key, key_size, 0) < 0))
 		return send_drop_notify_error(ctx, 0, DROP_NO_TUNNEL_KEY, CTX_ACT_DROP,
 										METRIC_INGRESS);
-
-	if (!arp_validate(ctx, &mac, &smac, &sip, &tip) || !__lookup_ip4_endpoint(tip))
+	if (!arp_validate(ctx, &mac, &smac, &sip, &tip))
 		goto pass_to_stack;
+
+    target_endpoint_info = __lookup_ip4_endpoint(tip);
+	if (!target_endpoint_info)
+	    goto pass_to_stack;
+
 	vkey.vtep_ip = sip & VTEP_MASK;
+	vkey.vtep_vni = target_endpoint_info->sec_id;
 	info = map_lookup_elem(&VTEP_MAP, &vkey);
 	if (!info)
 		goto pass_to_stack;
@@ -507,8 +513,8 @@ int tail_handle_arp(struct __ctx_buff *ctx)
 		return send_drop_notify_error(ctx, 0, ret, CTX_ACT_DROP, METRIC_EGRESS);
 	if (info->tunnel_endpoint) {
 		ret = __encap_and_redirect_with_nodeid(ctx, 0, info->tunnel_endpoint,
-						       LOCAL_NODE_ID, 102,
-						       102, &trace);
+						       LOCAL_NODE_ID, vkey.vtep_vni,
+						       vkey.vtep_vni, &trace);
 		if (IS_ERR(ret))
 			goto drop_err;
 

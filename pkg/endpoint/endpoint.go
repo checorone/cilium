@@ -2100,6 +2100,7 @@ func (e *Endpoint) runIdentityResolver(ctx context.Context, myChangeRev int, blo
 	// store, do it first synchronously right now. This can reduce the number
 	// of regenerations for the endpoint during its initialization.
 	regenTriggered = false
+	log.Info("HERE 23")
 	if blocking || identity.IdentityAllocationIsLocal(newLabels) {
 		scopedLog.Info("Resolving identity labels (blocking)")
 		regenTriggered, err = e.identityLabelsChanged(ctx, myChangeRev)

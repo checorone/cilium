@@ -783,9 +783,14 @@ handle_ipv4_cont(struct __ctx_buff *ctx, __u32 secctx, const bool from_host,
 	{
 		struct vtep_key vkey = {};
 		struct vtep_value *vtep;
+		struct endpoint_info *source_endpoint_info;
+
+        source_endpoint_info = __lookup_ip4_endpoint(ip4->saddr);
+        if (!source_endpoint_info)
+            goto skip_vtep;
 
 		vkey.vtep_ip = ip4->daddr & VTEP_MASK;
-		vkey.vtep_vni = 101;
+        vkey.vtep_vni = source_endpoint_info->sec_id;
 		vtep = map_lookup_elem(&VTEP_MAP, &vkey);
 		if (!vtep)
 			goto skip_vtep;
@@ -794,8 +799,8 @@ handle_ipv4_cont(struct __ctx_buff *ctx, __u32 secctx, const bool from_host,
 			if (eth_store_daddr(ctx, (__u8 *)&vtep->vtep_mac, 0) < 0)
 				return DROP_WRITE_ERROR;
 			return __encap_and_redirect_with_nodeid(ctx, 0, vtep->tunnel_endpoint,
-								secctx, 103,
-								103, &trace);
+								secctx, vkey.vtep_vni,
+								vkey.vtep_vni, &trace);
 		}
 	}
 skip_vtep:

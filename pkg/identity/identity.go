@@ -5,6 +5,7 @@ package identity
 
 import (
 	"encoding/json"
+	log "github.com/sirupsen/logrus"
 	"net"
 	"strconv"
 
@@ -238,6 +239,7 @@ func AddUserDefinedNumericIdentitySet(m map[string]string) error {
 // LookupReservedIdentityByLabels looks up a reserved identity by its labels and
 // returns it if found. Returns nil if not found.
 func LookupReservedIdentityByLabels(lbls labels.Labels) *Identity {
+	log.Info("HERE d")
 	if identity := WellKnown.LookupByLabels(lbls); identity != nil {
 		return identity
 	}

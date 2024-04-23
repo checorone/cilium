@@ -142,6 +142,7 @@ data:
   #   backend. Upgrades from these older cilium versions should continue using
   #   the kvstore by commenting out the identity-allocation-mode below, or
   #   setting it to "kvstore".
+  fixed-identity-mapping: {{ .Values.fixedIdentityMapping | quote}}
   identity-allocation-mode: {{ .Values.identityAllocationMode }}
   identity-heartbeat-timeout: {{ include "validateDuration" .Values.operator.identityHeartbeatTimeout | quote }}
   identity-gc-interval: {{ include "validateDuration" .Values.operator.identityGCInterval | quote }}

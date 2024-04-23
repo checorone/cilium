@@ -3,12 +3,25 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: busybox-master
+  name: busybox-user1
   labels:
-    app: busybox
+    io.cilium.fixed-identity: user1
 spec:
   containers:
   - name: busybox
     image: busybox
     imagePullPolicy: IfNotPresent
     command: ['sh', '-c', 'echo Container 1 is Running ; sleep 3600']
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-user2
+  labels:
+    io.cilium.fixed-identity: user2
+spec:
+  containers:
+    - name: busybox
+      image: busybox
+      imagePullPolicy: IfNotPresent
+      command: ['sh', '-c', 'echo Container 1 is Running ; sleep 3600']

@@ -190,6 +190,7 @@ ifneq ("$(wildcard $(ROOT_DIR)/contrib/testing/kind-custom.yaml)","")
 	KIND_VALUES_FAST_FILES := $(KIND_VALUES_FAST_FILES) --helm-values=$(ROOT_DIR)/contrib/testing/kind-custom.yaml
 endif
 
+
 .PHONY: kind-install-cilium-fast
 kind-install-cilium-fast: kind-ready ## "Fast" Install a local Cilium version using volume-mounted binaries into all clusters.
 	@echo "  INSTALL cilium"
@@ -200,6 +201,21 @@ kind-install-cilium-fast: kind-ready ## "Fast" Install a local Cilium version us
 		$(CILIUM_CLI) install --context=kind-$$cluster_name \
 			--chart-directory=$(ROOT_DIR)/install/kubernetes/cilium \
 			$(KIND_VALUES_FAST_FILES) \
+			--version= >/dev/null 2>&1 & \
+	done
+
+KIND_VALUES_FAST_VTEP_FILES := $(KIND_VALUES_FAST_FILES) --helm-values=$(ROOT_DIR)/contrib/testing/kind-vtep.yaml
+
+.PHONY: kind-install-cilium-vtep-fast
+kind-install-cilium-vtep-fast: kind-ready ## "Fast" Install a local Cilium version using volume-mounted binaries into all clusters.
+	@echo "  INSTALL cilium"
+	docker pull quay.io/cilium/cilium-ci:latest
+	for cluster_name in $${KIND_CLUSTERS:-$(shell kind get clusters)}; do \
+		kind load docker-image --name $$cluster_name quay.io/cilium/cilium-ci:latest; \
+		$(CILIUM_CLI) --context=kind-$$cluster_name uninstall >/dev/null 2>&1 || true; \
+		$(CILIUM_CLI) install --context=kind-$$cluster_name \
+			--chart-directory=$(ROOT_DIR)/install/kubernetes/cilium \
+			$(KIND_VALUES_FAST_VTEP_FILES) \
 			--version= >/dev/null 2>&1 & \
 	done
 

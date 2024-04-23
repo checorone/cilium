@@ -1,0 +1,14 @@
+fixedIdentityMapping: 140=user1,130=user2
+vtep:
+  # -- Enables VXLAN Tunnel Endpoint (VTEP) Integration (beta) to allow
+  # Cilium-managed pods to talk to third party VTEP devices over Cilium tunnel.
+  enabled: true
+  # -- A space separated list of VTEP device endpoint IPs, for example "1.1.1.1  1.1.2.1"
+  endpoint: "172.19.0.1 172.19.0.1"
+  # -- A space separated list of VTEP device CIDRs, for example "1.1.1.0/24 1.1.2.0/24"
+  cidr: "10.1.5.0/24 10.1.5.0/24"
+  vni: "140 130"
+  # -- VTEP CIDRs Mask that applies to all VTEP CIDRs, for example "255.255.255.0"
+  mask: "255.255.255.0"
+  # -- A space separated list of VTEP device MAC addresses (VTEP MAC), for example "x:x:x:x:x:x  y:y:y:y:y:y:y"
+  mac: "00:50:56:A0:7D:D8 00:50:56:A0:7D:D8"
