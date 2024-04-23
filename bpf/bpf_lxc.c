@@ -1178,18 +1178,20 @@ skip_egress_gateway:
 	{
 		struct vtep_key vkey = {};
 		struct vtep_value *vtep;
+		struct remote_endpoint_info *sinfo;
 
 		vkey.vtep_ip = ip4->daddr & VTEP_MASK;
+		vkey.vtep_vni = 101;
 		vtep = map_lookup_elem(&VTEP_MAP, &vkey);
 		if (!vtep)
 			goto skip_vtep;
-
+        sinfo = lookup_ip4_remote_endpoint(orig_sip, 0);
 		if (vtep->vtep_mac && vtep->tunnel_endpoint) {
 			if (eth_store_daddr(ctx, (__u8 *)&vtep->vtep_mac, 0) < 0)
 				return DROP_WRITE_ERROR;
 			return __encap_and_redirect_with_nodeid(ctx, 0, vtep->tunnel_endpoint,
-								SECLABEL_IPV4, WORLD_IPV4_ID,
-								WORLD_IPV4_ID, &trace);
+								SECLABEL_IPV4, sinfo->sec_identity,
+								sinfo->sec_identity, &trace);
 		}
 	}
 skip_vtep:

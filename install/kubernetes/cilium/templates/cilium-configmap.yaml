@@ -1049,6 +1049,9 @@ data:
 {{- if hasKey .Values.vtep "cidr" }}
   vtep-cidr: {{ .Values.vtep.cidr | quote }}
 {{- end }}
+{{- if hasKey .Values.vtep "vni" }}
+  vtep-vni: {{ .Values.vtep.vni | quote }}
+{{- end }}
 {{- if hasKey .Values.vtep "mask" }}
   vtep-mask: {{ .Values.vtep.mask | quote }}
 {{- end }}

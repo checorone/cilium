@@ -316,10 +316,11 @@ func syncVTEP(context.Context) error {
 func setupVTEPMapping() error {
 	for i, ep := range option.Config.VtepEndpoints {
 		log.WithFields(logrus.Fields{
-			logfields.IPAddr: ep,
+			logfields.IPAddr:   ep,
+			logfields.Identity: ep,
 		}).Debug("Updating vtep map entry for VTEP")
 
-		err := vtep.UpdateVTEPMapping(option.Config.VtepCIDRs[i], ep, option.Config.VtepMACs[i])
+		err := vtep.UpdateVTEPMapping(option.Config.VtepCIDRs[i], option.Config.VtepVNIs[i], ep, option.Config.VtepMACs[i])
 		if err != nil {
 			return fmt.Errorf("Unable to set up VTEP ipcache mappings: %w", err)
 		}

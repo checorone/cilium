@@ -493,6 +493,7 @@ struct srv6_ipv6_2tuple {
 
 struct vtep_key {
 	__u32 vtep_ip;
+	__u32 vtep_vni;
 };
 
 struct vtep_value {

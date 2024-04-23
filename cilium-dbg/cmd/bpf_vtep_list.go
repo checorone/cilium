@@ -15,18 +15,18 @@ import (
 )
 
 const (
-	vtepCidrTitle = "IP PREFIX/ADDRESS"
-	vtepTitle     = "VTEP"
+	vtepCidrVniTitle = "IP PREFIX/ADDRESS | VNI"
+	vtepTitle        = "VTEP"
 )
 
 var (
-	vtepListUsage = "List VTEP CIDR and their corresponding VTEP MAC/IP.\n"
+	vtepListUsage = "List VTEP CIDR/VNI pairs and their corresponding VTEP MAC/IP.\n"
 )
 
 var bpfVtepListCmd = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{"ls"},
-	Short:   "List VTEP CIDR and their corresponding VTEP MAC/IP",
+	Short:   "List VTEP CIDR|VNI pairs and their corresponding VTEP MAC/IP",
 	Long:    vtepListUsage,
 	Run: func(cmd *cobra.Command, args []string) {
 		common.RequireRootPrivilege("cilium bpf vtep list")
@@ -48,7 +48,7 @@ var bpfVtepListCmd = &cobra.Command{
 		if len(bpfVtepList) == 0 {
 			fmt.Fprintf(os.Stderr, "No entries found.\n")
 		} else {
-			TablePrinter(vtepCidrTitle, vtepTitle, bpfVtepList)
+			TablePrinter(vtepCidrVniTitle, vtepTitle, bpfVtepList)
 		}
 	},
 }

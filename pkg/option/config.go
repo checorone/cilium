@@ -1121,6 +1121,9 @@ const (
 	// VTEP CIDRs
 	VtepCIDR = "vtep-cidr"
 
+	// VTEP VNIs
+	VtepVNI = "vtep-vni"
+
 	// VTEP CIDR Mask applies to all VtepCIDR
 	VtepMask = "vtep-mask"
 
@@ -2262,8 +2265,11 @@ type DaemonConfig struct {
 	// VtepEndpoints VTEP endpoint IPs
 	VtepEndpoints []net.IP
 
-	// VtepCIDRs VTEP CIDRs
+	// VtepCIDRs VTEP VNIs
 	VtepCIDRs []*cidr.CIDR
+
+	// VtepCIDRs VTEP CIDRs
+	VtepVNIs []uint32
 
 	// VtepMask VTEP Mask
 	VtepCidrMask net.IP
@@ -3790,13 +3796,15 @@ func (c *DaemonConfig) calculateDynamicBPFMapSizes(vp *viper.Viper, totalMemory 
 func (c *DaemonConfig) validateVTEP(vp *viper.Viper) error {
 	vtepEndpoints := vp.GetStringSlice(VtepEndpoint)
 	vtepCIDRs := vp.GetStringSlice(VtepCIDR)
+	vtepVNIs := vp.GetStringSlice(VtepVNI)
 	vtepCidrMask := vp.GetString(VtepMask)
 	vtepMACs := vp.GetStringSlice(VtepMAC)
 
 	if (len(vtepEndpoints) < 1) ||
 		len(vtepEndpoints) != len(vtepCIDRs) ||
+		len(vtepEndpoints) != len(vtepVNIs) ||
 		len(vtepEndpoints) != len(vtepMACs) {
-		return fmt.Errorf("VTEP configuration must have the same number of Endpoint, VTEP and MAC configurations (Found %d endpoints, %d MACs, %d CIDR ranges)", len(vtepEndpoints), len(vtepMACs), len(vtepCIDRs))
+		return fmt.Errorf("VTEP configuration must have the same number of Endpoint, VTEP and MAC configurations (Found %d endpoints, %d MACs,  %d VNIs and %d CIDR ranges)", len(vtepEndpoints), len(vtepMACs), len(vtepVNIs), len(vtepCIDRs))
 	}
 	if len(vtepEndpoints) > defaults.MaxVTEPDevices {
 		return fmt.Errorf("VTEP must not exceed %d VTEP devices (Found %d VTEPs)", defaults.MaxVTEPDevices, len(vtepEndpoints))
@@ -3820,6 +3828,13 @@ func (c *DaemonConfig) validateVTEP(vp *viper.Viper) error {
 		}
 		c.VtepCIDRs = append(c.VtepCIDRs, externalCIDR)
 
+	}
+	for _, v := range vtepVNIs {
+		vni, err := strconv.ParseInt(v, 10, 32)
+		if err != nil {
+			return fmt.Errorf("Invalid VTEP VNI: %v", v)
+		}
+		c.VtepVNIs = append(c.VtepVNIs, uint32(vni))
 	}
 	mask := net.ParseIP(vtepCidrMask)
 	if mask == nil {

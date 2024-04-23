@@ -1045,6 +1045,9 @@ func InitGlobalFlags(cmd *cobra.Command, vp *viper.Viper) {
 	flags.StringSlice(option.VtepCIDR, []string{}, "List of VTEP CIDRs that will be routed towards VTEPs for traffic cluster egress")
 	option.BindEnv(vp, option.VtepCIDR)
 
+	flags.StringSlice(option.VtepVNI, []string{}, "List of VTEP VNIs that will be routed towards VTEPs for traffic cluster egress")
+	option.BindEnv(vp, option.VtepVNI)
+
 	flags.String(option.VtepMask, "255.255.255.0", "VTEP CIDR Mask for all VTEP CIDRs")
 	option.BindEnv(vp, option.VtepMask)
 

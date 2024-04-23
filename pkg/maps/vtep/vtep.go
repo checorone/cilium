@@ -36,18 +36,21 @@ const (
 //
 // Must be in sync with struct vtep_key in <bpf/lib/common.h>
 type Key struct {
-	IP types.IPv4 `align:"vtep_ip"`
+	IP  types.IPv4 `align:"vtep_ip"`
+	VNI uint32     `align:"vtep_vni"`
 }
 
 func (k Key) String() string {
-	return k.IP.String()
+	return fmt.Sprintf("%s|%d", k.IP.String(), k.VNI)
 }
 
 func (k *Key) New() bpf.MapKey { return &Key{} }
 
-// NewKey returns an Key based on the provided IP address and mask.
-func NewKey(ip net.IP) Key {
-	result := Key{}
+// NewKey returns an Key based on the provided IP address, VNI and mask.
+func NewKey(ip net.IP, vni uint32) Key {
+	result := Key{
+		VNI: vni,
+	}
 
 	if ip4 := ip.To4(); ip4 != nil {
 		ip4.Mask(net.IPMask(option.Config.VtepCidrMask))
@@ -106,8 +109,8 @@ func VtepMap() *Map {
 }
 
 // Function to update vtep map with VTEP CIDR
-func UpdateVTEPMapping(newCIDR *cidr.CIDR, newTunnelEndpoint net.IP, vtepMAC mac.MAC) error {
-	key := NewKey(newCIDR.IP)
+func UpdateVTEPMapping(newCIDR *cidr.CIDR, newVNI uint32, newTunnelEndpoint net.IP, vtepMAC mac.MAC) error {
+	key := NewKey(newCIDR.IP, newVNI)
 
 	mac, err := vtepMAC.Uint64()
 	if err != nil {

@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"strconv"
 
 	"github.com/cilium/cilium/pkg/cidr"
 	"github.com/cilium/cilium/pkg/common"
@@ -28,7 +29,12 @@ var bpfVtepDeleteCmd = &cobra.Command{
 			Fatalf("error parsing cidr %s: %s", args[0], err)
 		}
 
-		key := vtep.NewKey(vcidr.IP)
+		vni, err := strconv.ParseUint(args[1], 10, 32)
+		if err != nil {
+			Fatalf("error parsing vni %s: %s", args[1], err)
+		}
+
+		key := vtep.NewKey(vcidr.IP, uint32(vni))
 
 		if err := vtep.VtepMap().Delete(&key); err != nil {
 			Fatalf("error deleting contents of map: %s\n", err)

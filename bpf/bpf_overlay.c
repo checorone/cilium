@@ -345,6 +345,7 @@ static __always_inline int handle_ipv4(struct __ctx_buff *ctx,
 			struct vtep_value *vtep;
 
 			vkey.vtep_ip = ip4->saddr & VTEP_MASK;
+			vkey.vtep_vni = *identity;
 			vtep = map_lookup_elem(&VTEP_MAP, &vkey);
 			if (!vtep)
 				goto skip_vtep;
@@ -506,8 +507,8 @@ int tail_handle_arp(struct __ctx_buff *ctx)
 		return send_drop_notify_error(ctx, 0, ret, CTX_ACT_DROP, METRIC_EGRESS);
 	if (info->tunnel_endpoint) {
 		ret = __encap_and_redirect_with_nodeid(ctx, 0, info->tunnel_endpoint,
-						       LOCAL_NODE_ID, 101,
-						       101, &trace);
+						       LOCAL_NODE_ID, 102,
+						       102, &trace);
 		if (IS_ERR(ret))
 			goto drop_err;
 

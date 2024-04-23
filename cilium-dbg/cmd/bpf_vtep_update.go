@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 
 	"github.com/spf13/cobra"
 
@@ -34,17 +35,22 @@ var bpfVtepUpdateCmd = &cobra.Command{
 			Fatalf("error parsing cidr %s: %s", args[0], err)
 		}
 
-		vip := net.ParseIP(args[1]).To4()
-		if vip == nil {
-			Fatalf("Unable to parse IP '%s'", args[1])
-		}
-
-		vmac, err := mac.ParseMAC(args[2])
+		vni, err := strconv.ParseUint(args[1], 10, 32)
 		if err != nil {
-			Fatalf("Unable to parse vtep mac '%s'", args[2])
+			Fatalf("error parsing vni %s: %s", args[1], err)
 		}
 
-		if err := vtep.UpdateVTEPMapping(vcidr, vip, vmac); err != nil {
+		vip := net.ParseIP(args[2]).To4()
+		if vip == nil {
+			Fatalf("Unable to parse IP '%s'", args[3])
+		}
+
+		vmac, err := mac.ParseMAC(args[3])
+		if err != nil {
+			Fatalf("Unable to parse vtep mac '%s'", args[3])
+		}
+
+		if err := vtep.UpdateVTEPMapping(vcidr, uint32(vni), vip, vmac); err != nil {
 			fmt.Fprintf(os.Stderr, "error updating contents of map: %s\n", err)
 			os.Exit(1)
 		}

@@ -543,7 +543,7 @@ const (
 
 	// EnableVTEP enables VXLAN Tunnel Endpoint (VTEP) Integration
 	EnableVTEP     = false
-	MaxVTEPDevices = 8
+	MaxVTEPDevices = 1_000_000
 
 	// Enable BGP control plane features.
 	EnableBGPControlPlane = false
